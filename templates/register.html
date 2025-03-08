@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/static/register_style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <input type="text" name="username" placeholder="Username" required />
+            <input type="password" name="password" placeholder="Password" required />
+            <input type="password" name="retype_password" placeholder="Retype Password" required />
+            <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <a href="/">Login</a></p>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const response = await fetch("/register", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert(data.success); // Show success message
+                window.location.href = "/"; // Redirect after successful registration
+            } else {
+                alert(data.error); // Show error in popup
+            }
+        });
+    </script>
+</body>
+</html>

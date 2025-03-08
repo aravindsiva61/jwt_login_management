@@ -1,0 +1,37 @@
+name: Login management Release
+
+on:
+  push:
+    tags:
+      - "v*" 
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.21
+
+    - name: Extract Version from Tag
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+    - name: Build Binary
+      run: go build -o calculator-${{ env.VERSION }} main.go
+
+    - name: Upload Binary to GitHub Releases
+      uses: softprops/action-gh-release@v2
+      with:
+        files: calculator-${{ env.VERSION }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: ${{ env.VERSION }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
