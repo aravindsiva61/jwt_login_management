@@ -47,7 +47,49 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 			Path:     "/",
 		})
 
-		w.Write([]byte("User Login Successful!"))
+		htmlResponse := fmt.Sprintf(`
+		<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Login Success</title>
+			<style>
+				body {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					height: 100vh;
+					margin: 0;
+					font-family: Arial, sans-serif;
+					background-color: #f4f4f4;
+				}
+				.container {
+					text-align: center;
+					background: white;
+					padding: 20px;
+					box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+					border-radius: 10px;
+				}
+				h1 {
+					color: #4CAF50;
+				}
+				p {
+					color: #333;
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<h1>User Login Successful!</h1>
+				<p>Email: %s</p>
+			</div>
+		</body>
+		</html>
+	`, username)
+
+		w.Header().Set("Content-Type", "text/html")
+		w.Write([]byte(htmlResponse))
 		return
 	}
 	templates.ExecuteTemplate(w, "login.html", nil)
