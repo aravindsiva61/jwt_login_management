@@ -17,6 +17,7 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// Login page handler to validate login and store jwt cookie
 func LoginPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
@@ -95,6 +96,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "login.html", nil)
 }
 
+// Helper function to ensure password length is more than 8 characters and contain 1 character and 1 number
 func ValidatePassword(password string) bool {
 
 	// Ensure password has at least one digit, one special character, and is at least 8 characters long
@@ -106,6 +108,7 @@ func ValidatePassword(password string) bool {
 
 }
 
+// Register page handler to register user, update them in database and also check password is valid
 func RegisterPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
@@ -146,6 +149,7 @@ func RegisterPage(w http.ResponseWriter, r *http.Request) {
 
 var jwtSecret = []byte("jwt_token")
 
+// Helper function to generate jwt token
 func GenerateJWT(username string) (string, error) {
 	claims := jwt.MapClaims{
 		"username": username,
@@ -156,6 +160,7 @@ func GenerateJWT(username string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
+// Admin page to validate admin credentials
 func AdminPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
@@ -189,6 +194,7 @@ func AdminPage(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "admin_login.html", nil)
 }
 
+// Validates JWT token read from cookie
 func ValidateJWT(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
@@ -213,6 +219,7 @@ func ValidateJWT(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Admin dashboard to fetch all user from database and display them
 func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	// Fetch all non-admin users
 	rows, _ := db.Query("SELECT id, username FROM users WHERE role != 'admin'")
@@ -234,6 +241,7 @@ func AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "admin.html", users)
 }
 
+// Function to update user details in database
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -257,12 +265,14 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
 
+// Function to delete user from database
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(r.FormValue("id"))
 	_, _ = db.Exec("DELETE FROM users WHERE id=?", id)
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
 
+// Forgot password handler to check if user is in database and generate token and send the reset passowrd link to email
 func ForgotPasswordPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		email := r.FormValue("email")
@@ -295,6 +305,7 @@ func ForgotPasswordPage(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "forgot_password.html", nil)
 }
 
+// Helper function to generate reset password token
 func generateResetToken() string {
 	rand.Seed(time.Now().UnixNano())
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -305,6 +316,7 @@ func generateResetToken() string {
 	return string(b)
 }
 
+// Helper function to send email using SMTP
 func sendEmail(to, resetLink string) {
 	from := "aravindshiva61@gmail.com"
 	password := "ueyy ziuj zixb jizn"
@@ -323,6 +335,7 @@ func sendEmail(to, resetLink string) {
 	}
 }
 
+// Function to validate token in reset password link and update the password in database
 func ResetPasswordPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 

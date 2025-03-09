@@ -74,12 +74,14 @@ func TestLoginPage(t *testing.T) {
 	})
 }
 
+// Test valid passowrd containing more than 8 characters with 1 special character and 1 number
 func TestValidPassword(t *testing.T) {
 	if !ValidatePassword("Password@123") {
 		t.Errorf("Expected valid password, but got invalid")
 	}
 }
 
+// Test invalid passowrd whuch does not contain more than 8 characters with 1 special character and 1 number
 func TestInvalidPassword(t *testing.T) {
 	if ValidatePassword("Password123") {
 		t.Errorf("Expected invalid password, but got valid")

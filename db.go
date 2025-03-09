@@ -9,6 +9,7 @@ import (
 
 var db *sql.DB
 
+// Iniitialize user and password reset table and insert admin credentials
 func InitDB() {
 	var err error
 	db, err = sql.Open("sqlite", "./users.db")
