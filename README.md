@@ -1,0 +1,3 @@
+User Authentication and SSO Implementation Using JWT.
+
+This application is a user authentication and management system built using Golang, SQLite, and JWT-based authentication. It allows users to register, log in, reset passwords, and provides an admin panel for managing users. Additionally, it implements Single Sign-On (SSO) with JWT, allowing users to authenticate once and access multiple parts of the system without logging in again.
