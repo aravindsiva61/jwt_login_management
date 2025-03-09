@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"fmt"
@@ -52,11 +53,29 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "login.html", nil)
 }
 
+func ValidatePassword(password string) bool {
+
+	// Ensure password has at least one digit, one special character, and is at least 8 characters long
+	re := regexp.MustCompile(`^[A-Za-z\d!@#$%^&*()_+\-=\[\]{}|;:'",.<>?/]{8,}$`)
+	hasNumber := regexp.MustCompile(`[0-9]`).MatchString(password)
+	hasSpecial := regexp.MustCompile(`[!@#$%^&*()_+\-=\[\]{}|;:'",.<>?/]+`).MatchString(password)
+
+	return re.MatchString(password) && hasNumber && hasSpecial
+
+}
+
 func RegisterPage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 		retypePassword := r.FormValue("retype_password")
+
+		if !ValidatePassword(password) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]string{"error": "Password must be at least 8 characters long and include 1 special character and 1 number"})
+			return
+		}
 
 		if password != retypePassword {
 			w.Header().Set("Content-Type", "application/json")

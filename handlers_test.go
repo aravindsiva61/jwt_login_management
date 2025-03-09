@@ -74,12 +74,24 @@ func TestLoginPage(t *testing.T) {
 	})
 }
 
+func TestValidPassword(t *testing.T) {
+	if !ValidatePassword("Password@123") {
+		t.Errorf("Expected valid password, but got invalid")
+	}
+}
+
+func TestInvalidPassword(t *testing.T) {
+	if ValidatePassword("Password123") {
+		t.Errorf("Expected invalid password, but got valid")
+	}
+}
+
 func TestRegisterPage(t *testing.T) {
 	setupTestDB()
 
 	//Test successful registration
 	t.Run("Successful Registration", func(t *testing.T) {
-		formData := "username=newuser&password=password123&retype_password=password123"
+		formData := "username=newuser&password=password@123&retype_password=password@123"
 		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBufferString(formData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
@@ -94,7 +106,7 @@ func TestRegisterPage(t *testing.T) {
 
 	// Test duplicate user
 	t.Run("Duplicate User Registration", func(t *testing.T) {
-		formData := "username=testuser&password=password123&retype_password=password123"
+		formData := "username=testuser&password=password@123&retype_password=password@123"
 		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBufferString(formData))
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		w := httptest.NewRecorder()
